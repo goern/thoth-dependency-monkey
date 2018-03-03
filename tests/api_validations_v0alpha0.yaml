@@ -1,0 +1,40 @@
+---
+- config:
+    - testset: "Thoth Dependency Monkey Validations API v0alpha0"
+
+- test:
+    - name: "Get non existing Validation"
+    - url: "/api/v0alpha0/validations/goern"
+    - headers: { accept: "application/json" }
+    - expected_status: [404]
+
+- test:
+    - name: "Get all Validations"
+    - url: "/api/v0alpha0/validations/"
+    - headers: { accept: "application/json" }
+    - expected_status: [200]
+
+- test:
+    - name: "Create a Validation"
+    - url: "/api/v0alpha0/validations/"
+    - method: "POST"
+    - body: '{"ecosystem":"pypi","stack_specification":"numpy"}'
+    - headers: {Content-Type: application/json}
+    - expected_status: [201]
+    - extract_binds:
+        - 'id': {'jsonpath_mini': 'id'}
+
+- test:
+    - name: "Get Validation just created and inspect it"
+    - url: {'template': "/api/v0alpha0/validations/$id"}
+    - validators:
+        - compare: {jsonpath_mini: 'id', comparator: 'str_eq', expected: {template: '$id'}}
+        - compare: {jsonpath_mini: 'phase', comparator: 'str_eq', expected: 'running'}
+        - compare: {jsonpath_mini: 'ecosystem', comparator: 'str_eq', expected: 'pypi'}
+        - compare: {jsonpath_mini: 'stack_specification', comparator: 'str_eq', expected: 'numpy'}
+
+- test:
+    - name: "Delete Validation just created"
+    - url: {'template': "/api/v0alpha0/validations/$id"}
+    - method: "DELETE"
+    - expected_status: [501]
