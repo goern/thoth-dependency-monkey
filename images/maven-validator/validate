@@ -1,0 +1,6 @@
+#!/bin/sh
+
+mvn -B archetype:generate \
+  -DarchetypeGroupId=org.apache.maven.archetypes \
+  -DgroupId=com.redhat.aicoe.thoth.dependency_monkey \
+  -DartifactId=maven_validator

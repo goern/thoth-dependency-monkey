@@ -1,0 +1,17 @@
+FROM registry.fedoraproject.org/fedora:27
+
+LABEL io.k8s.description="Thoth Dependency Monkey Validator for Pypi" \
+    io.k8s.display-name="Thoth: Maven Validator" \
+    io.openshift.tags="thoth,java,maven,dependency_monkey,validator" \
+    architecture=x86_64 \
+    name="ai-coe/mvn-validator" \
+    vendor="Red Hat CTO Office - AI CoE" \
+    license="GPLv3"
+
+USER 1001
+
+WORKDIR /opt/app-root/src
+
+COPY validate /opt/app-root/src
+
+ENTRYPOINT [ "/opt/app-root/src/validate" ]
