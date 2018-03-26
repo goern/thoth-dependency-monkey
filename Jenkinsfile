@@ -99,6 +99,14 @@ pipeline {
                             tagMap['pypi-validator'] = aIStacksPipelineUtils.buildImageWithTag(CI_TEST_NAMESPACE, "pypi-validator", '0.1.3')
                         }
                     }   
+                }
+                stage("NPM Validator") {
+                    steps {
+                        echo "Building NPM Validator container image..."
+                        script {
+                            tagMap['npm-validator'] = aIStacksPipelineUtils.buildImageWithTag(CI_TEST_NAMESPACE, "npm-validator", '0.1.0')
+                        }
+                    }   
                 } 
             }
         }
