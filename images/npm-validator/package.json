@@ -1,0 +1,23 @@
+{
+    "name": "npm-validator",
+    "version": "0.1.0",
+    "description": "Thoth Dependency Monkey Validator for NPM",
+    "main": "validator",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/AICoE/thoth-dependency-monkey.git"
+    },
+    "keywords": ["thoth", "nodejs", "npm", "dependency_monkey", "validator"],
+    "author": "Christoph Görn <goern@b4mad.net> (http://b4mad.net/datenbrei/)",
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/AICoE/thoth-dependency-monkey/issues"
+    },
+    "homepage": "https://github.com/AICoE/thoth-dependency-monkey#readme",
+    "dependencies": {
+        "winston": "^2.4.1"
+    }
+}
