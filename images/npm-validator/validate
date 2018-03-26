@@ -20,11 +20,61 @@
 const version = "0.1.0";
 const name = "Thoth: Dependency Monkey NPM Validator";
 
-const DEBUG = process.env.DEBUG || true;
+const DEBUG = process.env.DEBUG || false;
 
 const STACK_SPECIFICATION = process.env.STACK_SPECIFICATION || "bn-bruecken";
 const ECOSYSTEM = process.env.ECOSYSTEM || "npm";
 
 const winston = require("winston");
+const assert = require("assert");
+const npa = require("npm-package-arg");
 
-winston.info("%s %s starting up...", name, version);
+/**
+ * This will parse a NPM ecosystem software stack specification and return a list of package specifications
+ *
+ * @param {string} s is a software stack specification as given to `npm install <s>`
+ * @returns {Array}  of packages and their fetchSpec
+ */
+function parseStackSpecification(s) {
+    var result = [];
+    var fields = s.split(" "); // TODO this is way to trivial parsing...
+
+    try {
+        fields.forEach(package_spec => {
+            var parsed = npa(package_spec);
+
+            result.push(parsed);
+        });
+
+        return result;
+    } catch (ex) {
+        winston.error("can't parse: %s", s);
+    }
+}
+
+function main() {
+    if (DEBUG == true) {
+        winston.configure({
+            transports: [
+                new winston.transports.Console({
+                    timestamp: true,
+                    json: false,
+                    colorize: false,
+                    level: "debug"
+                })
+            ]
+        });
+    }
+
+    winston.info("%s %s starting up...", name, version);
+
+    var specs = parseStackSpecification(STACK_SPECIFICATION);
+
+    specs.forEach(package_spec => {
+        winston.debug(package_spec);
+    });
+}
+
+module.exports = parseStackSpecification;
+
+main();
