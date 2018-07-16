@@ -21,6 +21,7 @@
 import os
 import logging
 import uuid
+import urllib3
 
 from werkzeug.exceptions import BadRequest, ServiceUnavailable, NotImplemented
 from tempfile import NamedTemporaryFile
@@ -277,6 +278,12 @@ class ValidationDAO():
             logger.debug('we got no jobs...')
 
             return []
+
+        except urllib3.exceptions.MaxRetryError as exp:
+            logger.error(exp)
+
+            raise ServiceUnavailable(f'OpenShift: {exp}')
+
 
         return result
 
