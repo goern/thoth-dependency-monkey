@@ -87,13 +87,13 @@ pipeline {
 
                     openshift.withCluster() {
                         openshift.withProject(CI_TEST_NAMESPACE) {
-                            if (!openshift.selector("template/thoth-dependency-monkey-api-buildconfig").exists()) {
+                            if (!openshift.selector("template/thoth-dependency-monkey-buildconfig").exists()) {
                                 openshift.apply(readFile('openshift/buildConfig-template.yaml'))
                                 echo "BuildConfig Template created!"
                             }
 
                             /* Process the template and return the Map of the result */
-                            def model = openshift.process('thoth-dependency-monkey-api-buildconfig',
+                            def model = openshift.process('thoth-dependency-monkey-buildconfig',
                                     "-p", 
                                     "IMAGE_STREAM_TAG=${env.TAG}",
                                     "GITHUB_URL=https://github.com/${org}/${repo}",
@@ -127,7 +127,7 @@ pipeline {
                     steps {
                         echo "Building Thoth Dependency Monkey container image..."
                         script {
-                            tagMap['dependency-monkey-api'] = aIStacksPipelineUtils.buildImageWithTag(CI_TEST_NAMESPACE, "dependency-monkey-api", "${env.TAG}")
+                            tagMap['dependency-monkey'] = aIStacksPipelineUtils.buildImageWithTag(CI_TEST_NAMESPACE, "dependency-monkey", "${env.TAG}")
                         }
 
                     }
@@ -145,13 +145,13 @@ pipeline {
         stage("Deploy to Test") {
             steps {
                 script {
-                    // aIStacksPipelineUtils.redeployFromImageStreamTag(CI_TEST_NAMESPACE, "user-api", "${env.TAG}")
+                    // aIStacksPipelineUtils.redeployFromImageStreamTag(CI_TEST_NAMESPACE, "user", "${env.TAG}")
                     // redeploy from ImageStreamTag ${env.TAG}
                     openshift.withCluster() {
                         openshift.withProject(CI_TEST_NAMESPACE) {
-                            echo "Creating test tag from user-api:${env.TAG}"
+                            echo "Creating test tag from user:${env.TAG}"
 
-                            openshift.tag("${CI_TEST_NAMESPACE}/dependency-monkey-api:${env.TAG}", "${CI_TEST_NAMESPACE}/dependency-monkey-api:test")
+                            openshift.tag("${CI_TEST_NAMESPACE}/dependency-monkey:${env.TAG}", "${CI_TEST_NAMESPACE}/dependency-monkey:test")
 
                             /* Select the OpenShift DeploymentConfig object
                              * Initiate a `oc rollout latest` command
@@ -160,7 +160,7 @@ pipeline {
                              */
                             def result = null
 
-                            deploymentConfig = openshift.selector("dc", "dependency-monkey-api")
+                            deploymentConfig = openshift.selector("dc", "dependency-monkey")
                             deploymentConfig.rollout().latest()
 
                             timeout(10) {
@@ -201,9 +201,9 @@ pipeline {
                     // Tag ImageStreamTag ${env.TAG} as our new :stable
                     openshift.withCluster() {
                         openshift.withProject(CI_TEST_NAMESPACE) {
-                            echo "Creating stable tag from dependency-monkey-api:${env.TAG}"
+                            echo "Creating stable tag from dependency-monkey:${env.TAG}"
 
-                            openshift.tag("${CI_TEST_NAMESPACE}/dependency-monkey-api:${env.TAG}", "${CI_TEST_NAMESPACE}/dependency-monkey-api:stable")
+                            openshift.tag("${CI_TEST_NAMESPACE}/dependency-monkey:${env.TAG}", "${CI_TEST_NAMESPACE}/dependency-monkey:stable")
                         }
                     } // withCluster
                 } // script

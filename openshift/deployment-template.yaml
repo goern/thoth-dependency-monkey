@@ -1,16 +1,17 @@
 apiVersion: v1
 kind: Template
-labels:
-  template: dependency-monkey
-  thoth: 0.1.0
 metadata:
-  name: dependency-monkey-api
+  name: dependency-monkey
+  labels:
+    template: thoth-dependency-monkey-buildconfig
+    app: thoth
+    component: dependency-monkey
   annotations:
     description: >
       This is Thoth Dependency Monkey, it validates package dependencies in software stacks.
     openshift.io/display-name: Dependency Monkey
-    version: 0.2.0
-    tags: thoth,dependency_monkey, dependencymonkey, poc
+    thoth-station.ninja/version: 0.3.0
+    tags: thoth, dependency-monkey, dependencymonkey, poc
     template.openshift.io/documentation-url: https://github.com/Thoth-Station/dependency-monkey/
     template.openshift.io/long-description: >
       This template defines resources needed
@@ -28,14 +29,22 @@ objects:
     apiVersion: v1
     metadata:
       name: validation-job-runner
-      app: dependency-monkey
+      labels:
+        app: thoth
+        component: dependency-monkey
+      annotations:
+        thoth-station.ninja/version: 0.3.0
     automountServiceAccountToken: true
-  - apiVersion: v1
-    kind: RoleBinding
+
+  - kind: RoleBinding
+    apiVersion: v1
     metadata:
       name: validation-job-binding
       labels:
-        app: dependency-monkey
+        app: thoth
+        component: dependency-monkey
+      annotations:
+        thoth-station.ninja/version: 0.3.0
     roleRef:
       kind: ClusterRole
       name: view
@@ -46,20 +55,26 @@ objects:
   - kind: Route
     apiVersion: v1
     metadata:
-      name: dependency-monkey-api
+      name: dependency-monkey
       labels:
-        app: dependency-monkey
+        app: thoth
+        component: dependency-monkey
+      annotations:
+        thoth-station.ninja/version: 0.3.0
     spec:
       to:
         kind: Service
-        name: dependency-monkey-api
+        name: dependency-monkey
 
-  - apiVersion: v1
-    kind: Service
+  - kind: Service
+    apiVersion: v1
     metadata:
       labels:
-        app: dependency-monkey
-      name: dependency-monkey-api
+        app: thoth
+        component: dependency-monkey
+      annotations:
+        thoth-station.ninja/version: 0.3.0
+      name: dependency-monkey
     spec:
       ports:
         - name: 8080-tcp
@@ -67,32 +82,39 @@ objects:
           protocol: TCP
           targetPort: 8080
       selector:
-        deploymentconfig: dependency-monkey-api
+        deploymentconfig: dependency-monkey
 
-  - apiVersion: v1
-    kind: DeploymentConfig
+  - kind: DeploymentConfig
+    apiVersion: v1
     metadata:
       labels:
-        app: dependency-monkey
-      name: dependency-monkey-api
+        app: thoth
+        component: dependency-monkey
+      annotations:
+        thoth-station.ninja/version: 0.3.0
+      name: dependency-monkey
     spec:
       replicas: 1
       selector:
-        app: dependency-monkey
-        deploymentconfig: dependency-monkey-api
+        app: thoth
+        component: dependency-monkey
+        deploymentconfig: dependency-monkey
       template:
         metadata:
           labels:
-            app: dependency-monkey
-            deploymentconfig: dependency-monkey-api
+            app: thoth
+            component: dependency-monkey
+            deploymentconfig: dependency-monkey
+          annotations:
+            thoth-station.ninja/version: 0.3.0
         spec:
           serviceAccount: validation-job-runner
           serviceAccountName: validation-job-runner
           containers:
-            - name: dependency-monkey-api
+            - name: dependency-monkey
               from:
                 kind: ImageStreamTag
-                name: dependency-monkey-api:latest
+                name: dependency-monkey:latest
               imagePullPolicy: Always
               serviceAccountName: validation-job-runner
               ports:
@@ -117,7 +139,7 @@ objects:
           imageChangeParams:
             automatic: true
             containerNames:
-              - dependency-monkey-api
+              - dependency-monkey
             from:
               kind: ImageStreamTag
-              name: 'user-api:latest'
+              name: 'dependency-monkey:latest'

@@ -1,17 +1,18 @@
 apiVersion: v1
 kind: Template
-labels:
-  template: thoth-dependency-monkey-api-buildconfig
-  thoth: 0.1.0
 metadata:
-  name: thoth-dependency-monkey-api-buildconfig
+  name: thoth-dependency-monkey-buildconfig
+  labels:
+    template: thoth-dependency-monkey-buildconfig
+    app: thoth
+    component: dependency-monkey
   annotations:
     description: >
       This is Thoth Dependency Monkey API BuildConfig, this template is meant to be used by Bots,
       but could also be used by humans...
     openshift.io/display-name: Thoth Dependency Monkey API BuildConfig
-    version: 0.2.0
-    tags: poc,thoth,thoth-dependency-monkey-api,ai-stacks
+    thoth-station.ninja/version: 0.3.0
+    tags: poc,thoth,dependency-monkey,ai-stacks
     template.openshift.io/documentation-url: https://github.com/Thoth-Station/
     template.openshift.io/long-description: >
       This is Thoth Dependency Monkey API BuildConfig, this template is meant to be used by Bots,
@@ -23,8 +24,11 @@ objects:
     kind: ImageStream
     metadata:
       labels:
-        app: dependency-monkey
-      name: dependency-monkey-api
+        app: thoth
+        component: dependency-monkey
+      annotations:
+        thoth-station.ninja/version: 0.3.0
+      name: dependency-monkey
     spec:
       lookupPolicy:
         local: true
@@ -34,7 +38,10 @@ objects:
     apiVersion: v1
     metadata:
       labels:
-        app: dependency-monkey
+        app: thoth
+        component: dependency-monkey
+      annotations:
+        thoth-station.ninja/version: 0.3.0
       name: pypi-validator
     spec:
       lookupPolicy:
@@ -44,14 +51,17 @@ objects:
   - apiVersion: v1
     kind: BuildConfig
     metadata:
-      name: dependency-monkey-api
+      name: dependency-monkey
       labels:
-        app: dependency-monkey
+        app: thoth
+        component: dependency-monkey
+      annotations:
+        thoth-station.ninja/version: 0.3.0
     spec:
       output:
         to:
           kind: ImageStreamTag
-          name: "dependency-monkey-api:${IMAGE_STREAM_TAG}"
+          name: "dependency-monkey:${IMAGE_STREAM_TAG}"
       source:
         type: Git
         git:
@@ -71,7 +81,10 @@ objects:
     apiVersion: v1
     metadata:
       labels:
-        app: dependency-monkey
+        app: thoth
+        component: dependency-monkey
+      annotations:
+        thoth-station.ninja/version: 0.3.0
       name: pypi-validator
     spec:
       output:
